@@ -13,6 +13,13 @@ function salvarPedidoLocal(pedido: Pedido) {
   localStorage.setItem(PEDIDOS_KEY, JSON.stringify(pedidos));
 }
 
+export function getStaticPaths() {
+  return { paths: [{ params: { tenant: 'burguer-do-joao' } }], fallback: false };
+}
+export function getStaticProps() {
+  return { props: {} };
+}
+
 export default function CarrinhoPage() {
   const router = useRouter();
   const { tenant: tenantSlug } = router.query;

@@ -1,0 +1,8 @@
+# Pedido com ID dinamico - aponta para template em caminho que nao causa loop
+# Burguer-do-joao: arquivo estatico existe, mas IDs dos pedidos sao dinamicos
+/:tenant/pedido/:id /_templates/order.html 200
+
+# Para outros tenants (producao Cloudflare):
+/:tenant/pedido/sucesso /[tenant]/pedido/sucesso.html 200
+/:tenant/carrinho       /[tenant]/carrinho.html        200
+/:tenant                /[tenant].html                 200

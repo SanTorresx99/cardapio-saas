@@ -7,6 +7,13 @@ import CarrinhoDrawer from '@/components/Carrinho';
 import { adicionarItem, getCarrinho, totalItens } from '@/lib/carrinho';
 import type { Produto, Tenant, ItemCarrinho } from '@/types/cardapio';
 
+export function getStaticPaths() {
+  return { paths: [{ params: { tenant: 'burguer-do-joao' } }], fallback: false };
+}
+export function getStaticProps() {
+  return { props: {} };
+}
+
 export default function CardapioPublico() {
   const router = useRouter();
   const { tenant: tenantSlug } = router.query;

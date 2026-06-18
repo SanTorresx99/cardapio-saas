@@ -6,6 +6,13 @@ import type { Pedido } from '@/types/pedido';
 
 const PEDIDOS_KEY = 'pedidos_locais';
 
+export function getStaticPaths() {
+  return { paths: [{ params: { tenant: 'burguer-do-joao' } }], fallback: false };
+}
+export function getStaticProps() {
+  return { props: {} };
+}
+
 export default function PedidoSucesso() {
   const { query } = useRouter();
   const pedidoId = (query.id as string)?.slice(-6).toUpperCase() ?? '';

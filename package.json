@@ -4,8 +4,8 @@
   "description": "SaaS multi-tenant para cardápios digitais",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "preview": "next build && wrangler pages dev ./out",
+    "build": "next build && node scripts/postbuild.js",
+    "preview": "npm run build && wrangler pages dev ./out",
     "deploy": "wrangler pages deploy out",
     "type-check": "tsc --noEmit"
   },
