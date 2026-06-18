@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import QRCodePIX from '@/components/QRCodePIX';
+import BotaoWhatsApp from '@/components/BotaoWhatsApp';
 import type { Pedido } from '@/types/pedido';
 import { STATUS_LABEL } from '@/types/pedido';
 import { formatarPreco } from '@/lib/carrinho';
@@ -103,6 +104,11 @@ export default function PedidoPage() {
           >
             {confirmando ? 'Confirmando...' : '✓ Já realizei o pagamento PIX'}
           </button>
+          <BotaoWhatsApp
+            pedido={pedido}
+            nomeRestaurante={pedido.tenantSlug}
+            label="Enviar comprovante pelo WhatsApp"
+          />
           <Link
             href={`/${tenantSlug}`}
             className="block text-center text-sm text-gray-400 hover:text-gray-600"
