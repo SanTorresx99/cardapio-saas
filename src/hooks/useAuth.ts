@@ -22,18 +22,22 @@ export function useAuth() {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    if (data.success && data.token) {
-      localStorage.setItem(TOKEN_KEY, data.token);
-      setUser(data.user);
-      return { success: true as const };
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (data.success && data.token) {
+        localStorage.setItem(TOKEN_KEY, data.token);
+        setUser(data.user);
+        return { success: true as const };
+      }
+      return { success: false as const, error: (data.error as string) ?? 'Credenciais inválidas' };
+    } catch {
+      return { success: false as const, error: 'Erro de conexão. A API não está disponível.' };
     }
-    return { success: false as const, error: data.error as string };
   }, []);
 
   const logout = useCallback(async () => {

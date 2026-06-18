@@ -21,12 +21,17 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(email, password);
-    setLoading(false);
-    if (result.success) {
-      router.push('/dashboard');
-    } else {
-      setError(result.error ?? 'Credenciais inválidas');
+    try {
+      const result = await login(email, password);
+      if (result.success) {
+        router.push('/dashboard');
+      } else {
+        setError(result.error ?? 'Credenciais inválidas');
+      }
+    } catch {
+      setError('Erro inesperado. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   }
 
