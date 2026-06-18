@@ -1,7 +1,6 @@
 name = "cardapio-saas"
-type = "webpack"
 compatibility_date = "2026-06-01"
-main = "src/functions/_middleware.ts"
+pages_build_output_dir = "out"
 
 # ⚠️ Deixar vazio por enquanto (D1 será criado depois)
 # [[d1_databases]]

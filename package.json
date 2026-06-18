@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "preview": "next build && wrangler pages dev ./out --functions-directory ./src/functions",
-    "deploy": "wrangler deploy",
+    "preview": "next build && wrangler pages dev ./out",
+    "deploy": "wrangler pages deploy out",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
