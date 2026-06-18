@@ -28,34 +28,42 @@ const DEV_USERS = [
 ];
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  let body: unknown;
   try {
-    body = await request.json();
-  } catch {
-    return jsonResponse({ success: false, error: 'Body inválido' }, 400);
+    if (!env.JWT_SECRET) {
+      return jsonResponse({ success: false, error: 'Servidor não configurado: JWT_SECRET ausente' }, 500);
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return jsonResponse({ success: false, error: 'Body inválido' }, 400);
+    }
+
+    const parsed = LoginSchema.safeParse(body);
+    if (!parsed.success) {
+      return jsonResponse({ success: false, error: 'E-mail ou senha inválidos' }, 400);
+    }
+
+    const { email, password } = parsed.data;
+
+    const user = DEV_USERS.find(u => u.email === email && u.passwordHash === password);
+    if (!user) {
+      return jsonResponse({ success: false, error: 'Credenciais inválidas' }, 401);
+    }
+
+    const token = await signJWT(
+      { sub: user.id, email: user.email, name: user.name, role: user.role, tenantId: user.tenantId },
+      env.JWT_SECRET
+    );
+
+    return jsonResponse({
+      success: true,
+      token,
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, tenantId: user.tenantId },
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erro interno';
+    return jsonResponse({ success: false, error: `Erro interno: ${message}` }, 500);
   }
-
-  const parsed = LoginSchema.safeParse(body);
-  if (!parsed.success) {
-    return jsonResponse({ success: false, error: 'E-mail ou senha inválidos' }, 400);
-  }
-
-  const { email, password } = parsed.data;
-
-  // TODO: buscar usuário do D1 e comparar hash bcrypt
-  const user = DEV_USERS.find(u => u.email === email && u.passwordHash === password);
-  if (!user) {
-    return jsonResponse({ success: false, error: 'Credenciais inválidas' }, 401);
-  }
-
-  const token = await signJWT(
-    { sub: user.id, email: user.email, name: user.name, role: user.role, tenantId: user.tenantId },
-    env.JWT_SECRET
-  );
-
-  return jsonResponse({
-    success: true,
-    token,
-    user: { id: user.id, email: user.email, name: user.name, role: user.role, tenantId: user.tenantId },
-  });
 };
