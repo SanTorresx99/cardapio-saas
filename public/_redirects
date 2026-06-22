@@ -1,8 +1,9 @@
-# Pedido com ID dinamico - aponta para template em caminho que nao causa loop
-# Burguer-do-joao: arquivo estatico existe, mas IDs dos pedidos sao dinamicos
-/:tenant/pedido/:id /_templates/order.html 200
+# Bloqueia acesso direto aos arquivos shell internos
+/_shell*  /  301
 
-# Para outros tenants (producao Cloudflare):
-/:tenant/pedido/sucesso /[tenant]/pedido/sucesso.html 200
-/:tenant/carrinho       /[tenant]/carrinho.html        200
-/:tenant                /[tenant].html                 200
+# Catch-all para tenants dinâmicos
+# Destinos _shell*.html na raiz não têm trailing slash — não disparam loop
+/:tenant/pedido/sucesso/ /_shell-sucesso.html 200
+/:tenant/pedido/         /_shell-pedido.html 200
+/:tenant/carrinho/       /_shell-carrinho.html 200
+/:tenant/                /_shell.html 200

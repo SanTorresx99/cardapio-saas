@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { jsonResponse } from '@/lib/middleware';
+import { hashPassword, signJWT } from '@/lib/auth';
 import type { PagesFunction, Env } from '@/types/cloudflare';
 
 const RegisterSchema = z.object({
@@ -19,7 +20,7 @@ function slugify(text: string): string {
     .replace(/^-|-$/g, '');
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request }) => {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   let body: unknown;
   try {
     body = await request.json();
@@ -29,30 +30,45 @@ export const onRequestPost: PagesFunction<Env> = async ({ request }) => {
 
   const parsed = RegisterSchema.safeParse(body);
   if (!parsed.success) {
-    const firstError = parsed.error.errors[0];
-    return jsonResponse({ success: false, error: firstError.message }, 400);
+    return jsonResponse({ success: false, error: parsed.error.errors[0].message }, 400);
   }
 
-  const { name, email, restaurantName, phone } = parsed.data;
+  const { name, email, password, restaurantName, phone } = parsed.data;
 
-  // TODO: verificar e-mail duplicado no D1
-  // TODO: salvar tenant e usuário no D1 com senha em bcrypt hash
+  const existing = await env.DB.prepare(
+    'SELECT id FROM tenants WHERE email_admin = ?'
+  ).bind(email).first();
 
-  const tenantSlug = slugify(restaurantName);
-  const tenantId = `tenant_${Date.now()}`;
-  const userId = `usr_${Date.now()}`;
+  if (existing) {
+    return jsonResponse({ success: false, error: 'E-mail já cadastrado' }, 409);
+  }
+
+  let slug = slugify(restaurantName);
+  const slugConflict = await env.DB.prepare(
+    'SELECT id FROM tenants WHERE slug = ?'
+  ).bind(slug).first();
+  if (slugConflict) {
+    slug = `${slug}-${Date.now().toString(36)}`;
+  }
+
+  const senhaHash = await hashPassword(password);
+
+  const result = await env.DB.prepare(
+    `INSERT INTO tenants (nome, slug, email_admin, senha_hash, telefone_admin, whatsapp_numero, plano, status)
+     VALUES (?, ?, ?, ?, ?, ?, 'free', 'ativo')`
+  ).bind(restaurantName, slug, email, senhaHash, phone, phone).run();
+
+  const tenantId = result.meta.last_row_id;
+
+  const token = await signJWT(
+    { sub: String(tenantId), email, name: restaurantName, role: 'restaurant', tenantId: String(tenantId), tenantSlug: slug },
+    env.JWT_SECRET
+  );
 
   return jsonResponse({
     success: true,
     message: 'Restaurante cadastrado com sucesso',
-    data: {
-      userId,
-      tenantId,
-      tenantSlug,
-      name,
-      email,
-      restaurantName,
-      phone,
-    },
+    token,
+    user: { id: String(tenantId), email, name, restaurantName, tenantSlug: slug, role: 'restaurant' },
   }, 201);
 };

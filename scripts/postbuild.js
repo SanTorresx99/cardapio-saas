@@ -2,17 +2,23 @@ const fs = require('fs');
 const path = require('path');
 
 const OUT = path.join(__dirname, '..', 'out');
-const TEMPLATES = path.join(OUT, '_templates');
 
-fs.mkdirSync(TEMPLATES, { recursive: true });
+// Copia os HTMLs do burguer-do-joao para arquivos _shell*.html na raiz do out/
+// Esses arquivos não têm trailing slash então não casam com /:tenant/ (sem loop)
+const shells = [
+  ['burguer-do-joao/index.html',              '_shell.html'],
+  ['burguer-do-joao/carrinho/index.html',     '_shell-carrinho.html'],
+  ['burguer-do-joao/pedido/index.html',       '_shell-pedido.html'],
+  ['burguer-do-joao/pedido/sucesso/index.html','_shell-sucesso.html'],
+];
 
-// Copy [id].html to a safe path that won't match /:tenant/pedido/:id redirect rules
-const src = path.join(OUT, '[tenant]', 'pedido', '[id].html');
-const dest = path.join(TEMPLATES, 'order.html');
-
-if (fs.existsSync(src)) {
-  fs.copyFileSync(src, dest);
-  console.log('postbuild: copied order template to out/_templates/order.html');
-} else {
-  console.warn('postbuild: [id].html not found, skipping');
+for (const [src, dest] of shells) {
+  const srcPath = path.join(OUT, src);
+  const destPath = path.join(OUT, dest);
+  if (fs.existsSync(srcPath)) {
+    fs.copyFileSync(srcPath, destPath);
+    console.log(`postbuild: ${src} → ${dest}`);
+  } else {
+    console.warn(`postbuild: ${src} não encontrado`);
+  }
 }

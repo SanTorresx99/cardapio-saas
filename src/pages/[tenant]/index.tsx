@@ -115,7 +115,13 @@ export default function CardapioPublico() {
           )}
 
           {/* Grid de produtos */}
-          {produtosFiltrados.length === 0 ? (
+          {produtos.length === 0 ? (
+            <div className="text-center py-16 text-gray-400">
+              <p className="text-5xl mb-4">🍽️</p>
+              <p className="font-semibold text-gray-600 text-lg">Cardápio em construção</p>
+              <p className="text-sm mt-1">Este restaurante ainda não adicionou produtos.</p>
+            </div>
+          ) : produtosFiltrados.length === 0 ? (
             <p className="text-center text-gray-400 py-12">Nenhum produto nesta categoria.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -29,6 +29,58 @@ export function getTokenFromRequest(request: Request): string | null {
   return match ? match[1] : null;
 }
 
+function hexToBuffer(hex: string): ArrayBuffer {
+  const bytes = hex.match(/.{2}/g)!.map(b => parseInt(b, 16));
+  const buf = new ArrayBuffer(bytes.length);
+  new Uint8Array(buf).set(bytes);
+  return buf;
+}
+
+async function pbkdf2Derive(password: string, saltBuffer: ArrayBuffer): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits'],
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', hash: 'SHA-256', salt: saltBuffer, iterations: 100_000 },
+    key,
+    256,
+  );
+  return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  const saltBuffer = new ArrayBuffer(16);
+  crypto.getRandomValues(new Uint8Array(saltBuffer));
+  const salt = Array.from(new Uint8Array(saltBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  const hash = await pbkdf2Derive(password, saltBuffer);
+  return `pbkdf2:${salt}:${hash}`;
+}
+
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  if (stored.startsWith('pbkdf2:')) {
+    const parts = stored.split(':');
+    if (parts.length !== 3) return false;
+    const [, saltHex, expectedHash] = parts;
+    const computed = await pbkdf2Derive(password, hexToBuffer(saltHex));
+    return computed === expectedHash;
+  }
+  // Compatibilidade com hashes SHA-256 antigos (migração automática no próximo login)
+  if (stored.startsWith('sha256:')) {
+    const parts = stored.split(':');
+    if (parts.length !== 3) return false;
+    const [, saltHex, expectedHash] = parts;
+    const data = new TextEncoder().encode(`${saltHex}:${password}`);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    const computed = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return computed === expectedHash;
+  }
+  return false;
+}
+
 export function decodeTokenClient(token: string): JWTPayload | null {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));

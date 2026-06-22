@@ -47,8 +47,8 @@ export default function Dashboard() {
           <DashCard icon="👥" titulo="Clientes" desc="CRM e fidelidade" href="/dashboard/clientes" disponivel={false} />
           <DashCard icon="💰" titulo="Pagamentos PIX" desc="Histórico de recebimentos" href="/dashboard/pagamentos" disponivel={false} />
           <DashCard icon="⚙️" titulo="Configurações" desc="Dados do restaurante" href="/dashboard/configuracoes" disponivel={false} />
-          {user.tenantId && (
-            <DashCard icon="🔗" titulo="Ver Cardápio" desc="Como seus clientes veem" href={`/burguer-do-joao`} disponivel={true} externo />
+          {user.tenantSlug && (
+            <DashCard icon="🔗" titulo="Ver Cardápio" desc="Como seus clientes veem" href={`/${user.tenantSlug}`} disponivel={true} externo />
           )}
         </div>
 

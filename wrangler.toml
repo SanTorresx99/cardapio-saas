@@ -2,16 +2,22 @@ name = "cardapio-saas"
 compatibility_date = "2026-06-01"
 pages_build_output_dir = "out"
 
-# ⚠️ Deixar vazio por enquanto (D1 será criado depois)
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "cardapio-db"
-# database_id = "xxx"
+[[d1_databases]]
+binding = "DB"
+database_name = "cardapio-db"
+database_id = "cdbe3f21-745d-473f-bb78-189de2474838"
 
 [vars]
 ENVIRONMENT = "development"
-JWT_SECRET = "dev-secret-change-in-production"
+# JWT_SECRET deve ser definido via .dev.vars (local) ou `wrangler secret put JWT_SECRET` (produção)
+# NUNCA commitar o secret aqui
 
 [env.production]
 [env.production.vars]
 ENVIRONMENT = "production"
+# JWT_SECRET em produção: wrangler secret put JWT_SECRET --env production
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "cardapio-db"
+database_id = "cdbe3f21-745d-473f-bb78-189de2474838"

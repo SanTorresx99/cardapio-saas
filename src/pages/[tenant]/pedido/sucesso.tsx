@@ -50,7 +50,8 @@ export default function PedidoSucesso() {
         {pedido && (
           <BotaoWhatsApp
             pedido={pedido}
-            nomeRestaurante={pedido.tenantSlug}
+            nomeRestaurante={pedido.tenantNome ?? pedido.tenantSlug}
+            telefone={pedido.whatsappNumero ?? undefined}
             label="Confirmar pedido pelo WhatsApp"
           />
         )}

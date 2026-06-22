@@ -1,4 +1,5 @@
 export type StatusPedido =
+  | 'aguardando_pagamento'
   | 'aguardando_pix'
   | 'pix_confirmado'
   | 'em_preparo'
@@ -22,8 +23,11 @@ export interface Pedido {
   itens: ItemPedido[];
   total: number;
   status: StatusPedido;
-  pixPayload: string;
-  criadoEm: string;
+  pixPayload: string | null;
+  tenantNome?: string;
+  whatsappNumero?: string | null;
+  confirmacaoToken?: string;
+  criadoEm?: string;
 }
 
 export interface CriarPedidoRequest {
@@ -34,6 +38,7 @@ export interface CriarPedidoRequest {
 }
 
 export const STATUS_LABEL: Record<StatusPedido, string> = {
+  aguardando_pagamento: 'Aguardando Pagamento',
   aguardando_pix: 'Aguardando PIX',
   pix_confirmado: 'PIX Confirmado',
   em_preparo: 'Em Preparo',

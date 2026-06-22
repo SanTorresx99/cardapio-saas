@@ -13,7 +13,7 @@ export function useAuth() {
     if (token) {
       const payload = decodeTokenClient(token);
       if (payload) {
-        setUser({ id: payload.sub, email: payload.email, name: payload.name, role: payload.role, tenantId: payload.tenantId });
+        setUser({ id: payload.sub, email: payload.email, name: payload.name, role: payload.role, tenantId: payload.tenantId, tenantSlug: payload.tenantSlug });
       } else {
         localStorage.removeItem(TOKEN_KEY);
       }

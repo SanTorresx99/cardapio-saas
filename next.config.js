@@ -2,9 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Cloudflare Pages suporta Static Export
   output: 'export',
-  // Desabilitar imagem otimizada (Cloudflare não suporta on-demand)
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },

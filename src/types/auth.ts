@@ -4,6 +4,7 @@ export interface User {
   name: string;
   role: 'restaurant' | 'admin';
   tenantId?: string;
+  tenantSlug?: string;
 }
 
 export interface JWTPayload {
@@ -12,6 +13,7 @@ export interface JWTPayload {
   name: string;
   role: 'restaurant' | 'admin';
   tenantId?: string;
+  tenantSlug?: string;
   exp?: number;
   iat?: number;
 }

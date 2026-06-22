@@ -68,7 +68,7 @@ export default function CarrinhoPage() {
       if (data.success && data.pedido) {
         salvarPedidoLocal(data.pedido);
         limparCarrinho(tenantSlug as string);
-        router.push(`/${tenantSlug}/pedido/${data.pedido.id}`);
+        router.push(`/${tenantSlug}/pedido?id=${data.pedido.id}`);
       } else {
         setErro(data.error ?? 'Erro ao criar pedido.');
       }

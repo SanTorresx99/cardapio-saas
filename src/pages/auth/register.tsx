@@ -38,7 +38,8 @@ export default function Register() {
       });
       const data = await res.json();
       if (data.success) {
-        router.push('/auth/login?registered=true');
+        if (data.token) localStorage.setItem('auth_token', data.token);
+        router.push('/dashboard');
       } else {
         setError(data.error ?? 'Erro ao cadastrar. Tente novamente.');
       }
