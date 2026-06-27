@@ -1,5 +1,5 @@
-# Bloqueia acesso direto aos arquivos shell internos
-/_shell*  /  301
+# Bloqueia acesso direto aos arquivos shell internos (desativado pois causa loop de redirect nas rotas dinâmicas)
+# /_shell*  /  301
 
 # Catch-all para tenants dinâmicos
 # Destinos _shell*.html na raiz não têm trailing slash — não disparam loop
